@@ -1,0 +1,39 @@
+import os
+
+def count_lines_in_file(file_path):
+    """Counts the number of lines in a given file."""
+    try:
+        with open(file_path, 'r') as file:
+            return len(file.readlines())
+    except FileNotFoundError:
+        print(f"Error: File not found - {file_path}")
+        exit(1)
+
+# Define the industry and industry_wb dynamically
+industry = 'HOU_POS_SDP'
+industry_wb = 'housdp'
+
+# List of file paths to check, dynamically generated
+file_paths = [
+    f"/staging/prd/abcinc{industry_wb}A/config/extract_fact.hql",
+    f"/staging/prd/abcinc{industry_wb}B/config/extract_fact.hql",
+    f"/staging/prd/abcinc{industry_wb}C/config/extract_fact.hql",
+]
+
+# Count lines for each file
+line_counts = {}
+for path in file_paths:
+    line_counts[path] = count_lines_in_file(path)
+
+# Get unique line counts
+unique_counts = set(line_counts.values())
+
+# Check if all counts match
+if len(unique_counts) == 1:
+    print("Count is matching")
+else:
+    print("Count is mismatching")
+    print("Line counts:")
+    for path, count in line_counts.items():
+        print(f"{path}: {count}")
+    exit(1)
