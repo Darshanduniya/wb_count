@@ -1,0 +1,61 @@
+import sys
+
+def count_lines_between_select_and_where(file_path):
+    """Counts the number of lines between the SELECT line and WHERE it=it line in a file."""
+    try:
+        with open(file_path, 'r') as file:
+            lines = file.readlines()
+        
+        start_index = None
+        end_index = None
+
+        # Find the starting and ending line indexes
+        for i, line in enumerate(lines):
+            if 'SELECT' in line.upper():  # Start counting from SELECT
+                start_index = i
+            if 'WHERE IT=IT' in line.upper():  # End counting at WHERE it=it
+                end_index = i
+                break  # Stop searching after finding the end
+
+        # If both start and end are found
+        if start_index is not None and end_index is not None:
+            return end_index - start_index + 1
+        else:
+            print(f"SELECT or WHERE it=it not found in the file: {file_path}")
+            return 0
+    except FileNotFoundError:
+        print(f"Error: File not found - {file_path}")
+        return 0
+
+if __name__ == "__main__":
+    # Check for correct number of arguments
+    if len(sys.argv) != 2:
+        print("Usage: python script_name.py <industry>")
+        sys.exit(1)
+
+    # Get the industry parameter from command-line arguments
+    industry = sys.argv[1]
+    industry_wb = industry.lower()  # Convert industry to lowercase for dynamic paths
+
+    # Dynamic file paths
+    file_paths = [
+        f"/staging/prd/abcinc{industry_wb}A/config/extract_fact.hql",
+        f"/staging/prd/abcinc{industry_wb}B/config/extract_fact.hql",
+        f"/staging/prd/abcinc{industry_wb}C/config/extract_fact.hql"
+    ]
+
+    # Count lines for each file
+    line_counts = {}
+    for path in file_paths:
+        line_counts[path] = count_lines_between_select_and_where(path)
+
+    # Check if all counts are matching
+    if len(set(line_counts.values())) == 1:
+        print("Count is matching across all files:")
+        for file, count in line_counts.items():
+            print(f"{file} = {count}")
+    else:
+        print("Count is mismatch:")
+        for file, count in line_counts.items():
+            print(f"{file} = {count}")
+        sys.exit(1)
