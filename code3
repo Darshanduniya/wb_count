@@ -1,0 +1,31 @@
+def count_lines_between_select_and_where(file_path):
+    """Counts the number of lines between the SELECT line and WHERE it=it line in a file."""
+    try:
+        with open(file_path, 'r') as file:
+            lines = file.readlines()
+        
+        start_index = None
+        end_index = None
+
+        # Find the starting and ending line indexes
+        for i, line in enumerate(lines):
+            if 'SELECT' in line.upper():  # Start counting from SELECT
+                start_index = i
+            if 'WHERE IT=IT' in line.upper():  # End counting at WHERE it=it
+                end_index = i
+                break  # Stop searching after finding the end
+
+        # If both start and end are found
+        if start_index is not None and end_index is not None:
+            return end_index - start_index + 1
+        else:
+            print("SELECT or WHERE it=it not found in the file.")
+            return 0
+    except FileNotFoundError:
+        print(f"Error: File not found - {file_path}")
+        return 0
+
+# Example usage
+file_path = "/staging/prd/abcinchousdpA/config/extract_fact.hql"
+line_count = count_lines_between_select_and_where(file_path)
+print(f"Number of lines between SELECT and WHERE it=it: {line_count}")
